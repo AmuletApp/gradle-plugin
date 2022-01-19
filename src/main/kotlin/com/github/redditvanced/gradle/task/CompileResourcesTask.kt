@@ -15,7 +15,7 @@
 
 package com.github.redditvanced.gradle.task
 
-import com.android.build.gradle.BaseExtension
+import com.github.redditvanced.gradle.getAndroid
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.*
@@ -35,7 +35,7 @@ abstract class CompileResourcesTask : Exec() {
 	abstract val outputFile: RegularFileProperty
 
 	override fun exec() {
-		val android = project.extensions.getByName("android") as BaseExtension
+		val android = project.extensions.getAndroid()
 
 		val aaptExecutable = android.sdkDirectory.resolve("build-tools")
 			.resolve(android.buildToolsVersion)

@@ -3,6 +3,7 @@ package com.github.redditvanced.gradle
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.tasks.ProcessLibraryManifest
 import com.github.redditvanced.gradle.models.PluginManifest
+import com.github.redditvanced.gradle.task.CompileDexTask
 import com.github.redditvanced.gradle.task.CompileResourcesTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -10,15 +11,18 @@ import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.AbstractCopyTask
+import org.gradle.api.tasks.compile.AbstractCompile
 
 private const val TASK_GROUP = "reddit vanced"
 
+@Suppress("unused")
 abstract class Plugin : Plugin<Project> {
 	override fun apply(project: Project) {
 		project.extensions.create("redditVanced", RedditVancedExtension::class.java, project)
 		configureRedditConfiguration(project)
 
 		val intermediates = project.buildDir.resolve("intermediates")
+		val pluginClassFile = intermediates.resolve("pluginClass")
 
 		project.tasks.register("compileResources", CompileResourcesTask::class.java) { task ->
 			task.group = TASK_GROUP
@@ -45,25 +49,34 @@ abstract class Plugin : Plugin<Project> {
 			}
 		}
 
+		project.tasks.register("compileDex", CompileDexTask::class.java) { task ->
+			task.group = TASK_GROUP
+			task.pluginClassFile.set(pluginClassFile)
+
+			val kotlinTask = project.tasks.getByName("compileDebugKotlin") as AbstractCompile
+			task.dependsOn(kotlinTask)
+			task.input.from(kotlinTask.destinationDirectory)
+		}
+
 
 	}
-
-	internal fun ExtensionContainer.getRedditVanced() =
-		getByType(RedditVancedExtension::class.java)
-
-	internal fun ExtensionContainer.getAndroid() =
-		getByName("android") as BaseExtension
 }
+
+internal fun ExtensionContainer.getRedditVanced() =
+	getByType(RedditVancedExtension::class.java)
+
+internal fun ExtensionContainer.getAndroid() =
+	getByName("android") as BaseExtension
 
 abstract class RedditVancedExtension(project: Project) {
 	/**
 	 * The build method to use for this project.
 	 * This should never be changed from [ProjectType.PLUGIN] for plugins.
 	 */
-	val projectType: Property<ProjectType> =
+	var projectType: Property<ProjectType> =
 		project.objects.property(ProjectType::class.java).convention(ProjectType.PLUGIN)
 
-	val authors: ListProperty<PluginManifest.Author> =
+	var authors: ListProperty<PluginManifest.Author> =
 		project.objects.listProperty(PluginManifest.Author::class.java).empty()
 
 	/**
@@ -78,13 +91,13 @@ abstract class RedditVancedExtension(project: Project) {
 	 * Setting this will make your plugin not eligible to be published on the plugin store.
 	 * Example: `https://raw.githubusercontent.com/DiamondMiner88/aliucord-plugins/builds/plugin.rvp`
 	 */
-	val customUpdaterUrl: Property<String> =
+	var customUpdaterUrl: Property<String> =
 		project.objects.property(String::class.java)
 
 	/**
 	 * Entire history of the changelog, markdown supported.
 	 */
-	val changelog: Property<String> =
+	var changelog: Property<String> =
 		project.objects.property(String::class.java)
 
 	internal val minimumRedditVersion: Property<Int> =
@@ -93,7 +106,7 @@ abstract class RedditVancedExtension(project: Project) {
 	/**
 	 * The class that's annotated with `@RedditVancedPlugin`
 	 */
-	internal val pluginClass: Property<String> =
+	internal var pluginClass: Property<String> =
 		project.objects.property(String::class.java)
 }
 
