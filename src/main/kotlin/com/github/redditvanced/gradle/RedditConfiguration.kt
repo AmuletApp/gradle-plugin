@@ -36,7 +36,7 @@ fun configureRedditConfiguration(project: Project) {
 				else -> it.version
 			}
 
-			val tmpApkFile = File(System.getProperty("java.io.tmpdir"), "reddit-${version}-tmp.jar")
+			val tmpApkFile = File(System.getProperty("java.io.tmpdir"), "reddit-${version}-tmp.xapk")
 			val apkFile = File(cacheDir, "reddit-${version}.apk")
 			val jarFile = File(cacheDir, "reddit-${version}.jar")
 			cacheDir.mkdirs()
@@ -70,7 +70,7 @@ fun configureRedditConfiguration(project: Project) {
 					.skipDebug(false)
 					.topoLogicalSort()
 					.noCode(true)
-					.to(jarFile) // TODO: kotlin pls stop
+					.to(jarFile.toPath())
 			}
 
 			project.dependencies.add("compileOnly", project.files(jarFile))
