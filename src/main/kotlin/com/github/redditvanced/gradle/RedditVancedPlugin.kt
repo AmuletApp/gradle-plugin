@@ -1,20 +1,58 @@
 package com.github.redditvanced.gradle
 
+import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.tasks.ProcessLibraryManifest
 import com.github.redditvanced.gradle.models.PluginManifest
+import com.github.redditvanced.gradle.task.CompileResourcesTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.AbstractCopyTask
+
+private const val TASK_GROUP = "reddit vanced"
 
 abstract class RedditVancedPlugin : Plugin<Project> {
 	override fun apply(project: Project) {
 		project.extensions.create("redditVanced", RedditVancedExtension::class.java, project)
 		configureRedditConfiguration(project)
+
+		val intermediates = project.buildDir.resolve("intermediates")
+
+		project.tasks.register("compileResources", CompileResourcesTask::class.java) { task ->
+			task.group = TASK_GROUP
+
+			val processManifestTask = project.tasks.getByName("processDebugManifest") as ProcessLibraryManifest
+			task.dependsOn(processManifestTask)
+
+			val android = project.extensions.getAndroid()
+			task.input.set(android.sourceSets.getByName("main").res.srcDirs.single())
+			task.manifestFile.set(processManifestTask.manifestOutputFile)
+
+			task.outputFile.set(intermediates.resolve("res.apk"))
+
+			task.doLast { _ ->
+				val resApkFile = task.outputFile.asFile.get()
+
+				if (resApkFile.exists()) {
+					project.tasks.named("make", AbstractCopyTask::class.java) {
+						it.from(project.zipTree(resApkFile)) { copySpec ->
+							copySpec.exclude("AndroidManifest.xml")
+						}
+					}
+				}
+			}
+		}
+
+
 	}
 
-	fun ExtensionContainer.getRedditVanced() =
+	internal fun ExtensionContainer.getRedditVanced() =
 		getByType(RedditVancedExtension::class.java)
+
+	internal fun ExtensionContainer.getAndroid() =
+		getByName("android") as BaseExtension
 }
 
 abstract class RedditVancedExtension(project: Project) {
