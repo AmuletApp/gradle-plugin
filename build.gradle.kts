@@ -29,8 +29,8 @@ dependencies {
 gradlePlugin {
     plugins {
         create("com.github.redditvanced.gradle") {
-            id = "redditvanced-gradle"
-            implementationClass = "com.github.redditvanced.gradle.RedditVancedPlugin"
+            id = "redditvanced"
+            implementationClass = "com.github.redditvanced.gradle.Plugin"
         }
     }
 }

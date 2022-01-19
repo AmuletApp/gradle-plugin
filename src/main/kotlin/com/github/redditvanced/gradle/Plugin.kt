@@ -13,7 +13,7 @@ import org.gradle.api.tasks.AbstractCopyTask
 
 private const val TASK_GROUP = "reddit vanced"
 
-abstract class RedditVancedPlugin : Plugin<Project> {
+abstract class Plugin : Plugin<Project> {
 	override fun apply(project: Project) {
 		project.extensions.create("redditVanced", RedditVancedExtension::class.java, project)
 		configureRedditConfiguration(project)
