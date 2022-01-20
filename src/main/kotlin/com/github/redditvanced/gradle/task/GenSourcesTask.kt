@@ -52,6 +52,7 @@ abstract class GenSourcesTask : DefaultTask() {
 			decompiler.load()
 			decompiler.save()
 		}
+
 		project.logger.lifecycle("Decompiled to ${args.outDirSrc.absolutePath}")
 	}
 }

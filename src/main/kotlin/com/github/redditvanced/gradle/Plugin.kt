@@ -61,6 +61,11 @@ abstract class Plugin : Plugin<Project> {
 		project.tasks.register("genSources", GenSourcesTask::class.java) { task ->
 			task.group = TASK_GROUP
 		}
+
+		project.tasks.register("deployWithAdb", DeployWithAdbTask::class.java) {
+			it.group = TASK_GROUP
+			it.dependsOn("make")
+		}
 	}
 }
 
@@ -131,5 +136,13 @@ enum class ProjectType {
 	INJECTOR,
 
 	/* A regular RedditVanced plugin */
-	PLUGIN,
+	PLUGIN;
+
+	fun getRemotePath(buildFile: File): String {
+		return "/storage/emulated/0/RedditVanced/" + when (this) {
+			PLUGIN -> "plugins/${buildFile.name}"
+			INJECTOR -> "build/injector.dex"
+			CORE -> "build/core.zip"
+		}
+	}
 }
