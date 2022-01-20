@@ -3,8 +3,7 @@ package com.github.redditvanced.gradle
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.tasks.ProcessLibraryManifest
 import com.github.redditvanced.gradle.models.PluginManifest
-import com.github.redditvanced.gradle.task.CompileDexTask
-import com.github.redditvanced.gradle.task.CompileResourcesTask
+import com.github.redditvanced.gradle.task.*
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionContainer
@@ -59,7 +58,9 @@ abstract class Plugin : Plugin<Project> {
 			task.input.from(kotlinTask.destinationDirectory)
 		}
 
-
+		project.tasks.register("genSources", GenSourcesTask::class.java) { task ->
+			task.group = TASK_GROUP
+		}
 	}
 }
 
