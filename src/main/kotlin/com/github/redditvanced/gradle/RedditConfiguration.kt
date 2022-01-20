@@ -15,7 +15,8 @@ private const val DATA_URL = "https://raw.githubusercontent.com/RedditVanced/Red
 private const val APK_URL = "https://redditvanced.app/reddit/%s"
 
 fun configureRedditConfiguration(project: Project) {
-	val cacheDir = File(project.gradle.gradleUserHomeDir, "caches/redditvanced")
+	val extension = project.extensions.getRedditVanced()
+
 	project.configurations.register("redditApk") {
 		it.isTransitive = false
 	}
@@ -37,11 +38,9 @@ fun configureRedditConfiguration(project: Project) {
 			}
 
 			val tmpApkFile = File(System.getProperty("java.io.tmpdir"), "reddit-${version}-tmp.xapk")
-			val apkFile = File(cacheDir, "reddit-${version}.apk")
-			val jarFile = File(cacheDir, "reddit-${version}.jar")
-			cacheDir.mkdirs()
+			extension.cacheDir.mkdirs()
 
-			if (!apkFile.exists()) {
+			if (!extension.apkFile.exists()) {
 				project.logger.lifecycle("Downloading Reddit APK")
 				val url = URL(APK_URL.format(version))
 				val reader = BufferedReader(InputStreamReader(url.openStream()))
@@ -54,7 +53,7 @@ fun configureRedditConfiguration(project: Project) {
 				val zip = ZipFile(tmpApkFile)
 				val stream = zip.getInputStream(zip.getEntry("com.reddit.frontpage.apk"))
 
-				apkFile.outputStream().use { outStream ->
+				extension.apkFile.outputStream().use { outStream ->
 					stream.copyTo(outStream)
 					outStream.close()
 				}
@@ -62,18 +61,18 @@ fun configureRedditConfiguration(project: Project) {
 				tmpApkFile.delete()
 			}
 
-			if (!jarFile.exists()) {
+			if (!extension.jarFile.exists()) {
 				project.logger.lifecycle("Converting APK to jar")
 
-				val reader = MultiDexFileReader.open(Files.readAllBytes(jarFile.toPath()))
+				val reader = MultiDexFileReader.open(Files.readAllBytes(extension.jarFile.toPath()))
 				Dex2jar.from(reader)
 					.skipDebug(false)
 					.topoLogicalSort()
 					.noCode(true)
-					.to(jarFile.toPath())
+					.to(extension.jarFile.toPath())
 			}
 
-			project.dependencies.add("compileOnly", project.files(jarFile))
+			project.dependencies.add("compileOnly", project.files(extension.jarFile))
 		}
 	}
 }

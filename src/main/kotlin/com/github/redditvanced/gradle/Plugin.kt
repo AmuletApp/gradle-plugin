@@ -12,6 +12,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.AbstractCopyTask
 import org.gradle.api.tasks.compile.AbstractCompile
+import java.io.File
 
 private const val TASK_GROUP = "reddit vanced"
 
@@ -108,6 +109,17 @@ abstract class RedditVancedExtension(project: Project) {
 	 */
 	internal var pluginClass: Property<String> =
 		project.objects.property(String::class.java)
+
+	internal var redditVersionCode: Property<Int> =
+		project.objects.property(Int::class.java)
+
+	internal val cacheDir = File(project.gradle.gradleUserHomeDir, "caches/redditvanced")
+
+	internal val apkFile: File
+		get() = File(cacheDir, "discord-${redditVersionCode.get()}.apk")
+
+	internal val jarFile: File
+		get() = File(cacheDir, "discord-${redditVersionCode.get()}-sources.apk")
 }
 
 enum class ProjectType {
