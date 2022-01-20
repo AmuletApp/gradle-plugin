@@ -1,5 +1,6 @@
-package com.github.redditvanced.gradle
+package com.github.redditvanced.gradle.utils
 
+import com.github.redditvanced.gradle.getAndroid
 import org.gradle.api.Project
 import se.vidstige.jadb.*
 import java.nio.charset.StandardCharsets

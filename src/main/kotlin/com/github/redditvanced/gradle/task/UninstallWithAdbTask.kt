@@ -1,6 +1,6 @@
 package com.github.redditvanced.gradle.task
 
-import com.github.redditvanced.gradle.AdbUtils
+import com.github.redditvanced.gradle.utils.AdbUtils
 import com.github.redditvanced.gradle.ProjectType
 import com.github.redditvanced.gradle.getRedditVanced
 import org.gradle.api.DefaultTask
