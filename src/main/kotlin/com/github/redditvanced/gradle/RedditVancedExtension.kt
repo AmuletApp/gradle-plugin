@@ -40,11 +40,11 @@ abstract class RedditVancedExtension(project: Project) {
 	var changelog: Property<String> =
 		project.objects.property(String::class.java)
 
+	/**
+	 * Override the domain for fetching reddit versions and publishing plugins.
+	 */
 	var redditVancedBackend: Property<String> =
 		project.objects.property(String::class.java).convention("https://redditvanced.domain")
-
-	internal val minimumRedditVersion: Property<Int> =
-		project.objects.property(Int::class.java)
 
 	/**
 	 * The class that's annotated with `@RedditVancedPlugin`
@@ -52,16 +52,25 @@ abstract class RedditVancedExtension(project: Project) {
 	internal var pluginClass: Property<String> =
 		project.objects.property(String::class.java)
 
-	internal var redditVersionCode: Property<Int> =
+	internal var loadResources: Property<Boolean> =
+		project.objects.property(Boolean::class.java)
+
+	internal var requiresRestart: Property<Boolean> =
+		project.objects.property(Boolean::class.java)
+
+	/*
+	 * Internal build values
+	 */
+	internal var projectRedditVersion: Property<Int> =
 		project.objects.property(Int::class.java)
 
 	internal val cacheDir = File(project.gradle.gradleUserHomeDir, "caches/redditvanced")
 
 	internal val apkFile: File
-		get() = File(cacheDir, "discord-${redditVersionCode.get()}.apk")
+		get() = File(cacheDir, "discord-${projectRedditVersion.get()}.apk")
 
 	internal val jarFile: File
-		get() = File(cacheDir, "discord-${redditVersionCode.get()}-sources.apk")
+		get() = File(cacheDir, "discord-${projectRedditVersion.get()}-sources.apk")
 }
 
 internal fun ExtensionContainer.getRedditVanced() =

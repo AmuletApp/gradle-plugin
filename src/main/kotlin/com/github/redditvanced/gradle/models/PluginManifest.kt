@@ -7,6 +7,7 @@ data class PluginManifest(
 	val changelog: String = "",
 	val description: String = "",
 	val authors: List<Author> = emptyList(),
+	val customUpdaterUrl: String? = null,
 	val loadResources: Boolean = false,
 	val requiresRestart: Boolean = false,
 ) {

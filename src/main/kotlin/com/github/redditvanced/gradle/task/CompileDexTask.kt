@@ -2,7 +2,9 @@ package com.github.redditvanced.gradle.task
 
 import com.android.build.gradle.internal.errors.MessageReceiverImpl
 import com.android.build.gradle.options.SyncOptions
-import com.android.builder.dexing.*
+import com.android.builder.dexing.ClassFileInputs
+import com.android.builder.dexing.DexArchiveBuilder
+import com.android.builder.dexing.DexParameters
 import com.android.builder.dexing.r8.ClassFileProviderFactory
 import com.github.redditvanced.gradle.getAndroid
 import com.github.redditvanced.gradle.getRedditVanced
@@ -27,9 +29,6 @@ abstract class CompileDexTask : DefaultTask() {
 
 	@get:OutputFile
 	abstract val outputFile: RegularFileProperty
-
-	@get:OutputFile
-	abstract val pluginClassFile: RegularFileProperty
 
 	@Suppress("UnstableApiUsage")
 	@TaskAction
@@ -78,14 +77,21 @@ abstract class CompileDexTask : DefaultTask() {
 
 			for (annotation in classNode.visibleAnnotations.orEmpty() + classNode.invisibleAnnotations.orEmpty()) {
 				if (annotation.desc == "Lcom/github/redditvanced/annotations/RedditVancedPlugin;") {
-					require(redditvanced.pluginClass.isPresent) { "Only 1 active plugin class per project is supported" }
+					require(!redditvanced.pluginClass.isPresent) { "Only 1 active plugin class per project is supported" }
+					redditvanced.pluginClass.set(classNode.name.replace('/', '.'))
 
-					val pluginClass = classNode.name.replace('/', '.')
-						.also { pluginClassFile.asFile.orNull?.writeText(it) }
-					redditvanced.pluginClass.set(pluginClass)
+					annotation.values.chunked(2).forEach {
+						when (it[0]) {
+							"loadResources" -> redditvanced.loadResources.set(it[1] as Boolean)
+							"requiresRestart" -> redditvanced.requiresRestart.set(it[1] as Boolean)
+						}
+					}
 				}
 			}
+		}
 
+		require(redditvanced.pluginClass.isPresent) {
+			"No plugin class found, make sure your plugin class is annotated with @RedditVancedPlugin"
 		}
 
 		logger.lifecycle("Compiled dex to ${outputFile.get()}")
