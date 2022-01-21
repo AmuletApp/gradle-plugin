@@ -56,14 +56,19 @@ abstract class Plugin : Plugin<Project> {
 			task.group = TASK_GROUP
 		}
 
-		project.tasks.register("deployWithAdb", DeployWithAdbTask::class.java) {
-			it.group = TASK_GROUP
-			it.dependsOn("make")
+		project.tasks.register("deployWithAdb", DeployWithAdbTask::class.java) { task ->
+			task.group = TASK_GROUP
+			task.dependsOn("make")
 		}
 
-		project.tasks.register("uninstallWithAdb", UninstallWithAdbTask::class.java) {
-			it.group = TASK_GROUP
-			it.dependsOn("make")
+		project.tasks.register("uninstallWithAdb", UninstallWithAdbTask::class.java) { task ->
+			task.group = TASK_GROUP
+			task.dependsOn("make")
+		}
+
+		project.tasks.register("requestPublishPlugin", RequestPublishPluginTask::class.java) { task ->
+			task.group = TASK_GROUP
+			task.enabled = project.extensions.getRedditVanced().projectType.get() == ProjectType.PLUGIN
 		}
 	}
 }

@@ -40,6 +40,9 @@ abstract class RedditVancedExtension(project: Project) {
 	var changelog: Property<String> =
 		project.objects.property(String::class.java)
 
+	var redditVancedBackend: Property<String> =
+		project.objects.property(String::class.java).convention("https://redditvanced.domain")
+
 	internal val minimumRedditVersion: Property<Int> =
 		project.objects.property(Int::class.java)
 
