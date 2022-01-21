@@ -1,7 +1,11 @@
 package com.github.redditvanced.gradle
 
+import com.github.kittinunf.fuel.gson.responseObject
+import com.github.kittinunf.fuel.httpGet
 import com.github.redditvanced.gradle.models.RedditAPK
 import com.github.redditvanced.gradle.models.RemoteData
+import com.github.redditvanced.gradle.utils.createProgressLogger
+import com.github.redditvanced.gradle.utils.download
 import com.googlecode.d2j.dex.Dex2jar
 import com.googlecode.d2j.reader.MultiDexFileReader
 import org.gradle.api.Project
@@ -28,8 +32,8 @@ fun configureRedditConfiguration(project: Project) {
 			val version = when (it.version) {
 				"SNAPSHOT" -> {
 					project.logger.lifecycle("Fetching core's reddit version")
-					val reader = BufferedReader(InputStreamReader(URL(DATA_URL).openStream()))
-					val data = gson.fromJson(reader, RemoteData::class.java)
+					val (_, _, result) = DATA_URL.httpGet().responseObject<RemoteData>()
+					val data = result.get()
 
 					project.logger.lifecycle("Fetched Reddit version: ${data.latestRedditVersionName} (${data.latestRedditVersionCode})")
 					data.latestRedditVersionCode
@@ -46,8 +50,7 @@ fun configureRedditConfiguration(project: Project) {
 				val reader = BufferedReader(InputStreamReader(url.openStream()))
 				val data = gson.fromJson(reader, RedditAPK::class.java)
 
-				val apkUrl = URL(data.downloadUrl)
-				apkUrl.download(tmpApkFile, createProgressLogger(project, "Download Reddit APK"))
+				URL(data.downloadUrl).download(tmpApkFile, createProgressLogger(project, "Download Reddit APK"))
 
 				project.logger.lifecycle("Extracting main apk from xapk")
 				val zip = ZipFile(tmpApkFile)

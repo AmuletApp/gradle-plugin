@@ -15,7 +15,7 @@
 
 // Credit to 6pak, https://github.com/Aliucord/gradle/commit/8ca3becd77b6d7676cf8287feb56027b19d07de7
 
-package com.github.redditvanced.gradle
+package com.github.redditvanced.gradle.utils
 
 import org.gradle.api.Project
 import org.gradle.api.internal.project.ProjectInternal

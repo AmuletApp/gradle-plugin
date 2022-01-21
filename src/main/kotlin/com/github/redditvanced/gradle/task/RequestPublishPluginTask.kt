@@ -15,7 +15,7 @@ abstract class RequestPublishPluginTask : DefaultTask() {
 		val baseUrl = extension.redditVancedBackend.get()
 
 		if (gitHasLocalCommit()) {
-			logger.lifecycle("Your git repository has unpushed commits! Are you sure you want to continue?")
+			logger.lifecycle("Your git repository has local commits! Are you sure you want to continue?")
 			ynConfirm()
 		}
 
