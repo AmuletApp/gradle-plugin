@@ -67,10 +67,10 @@ abstract class RedditVancedExtension(project: Project) {
 	internal val cacheDir = File(project.gradle.gradleUserHomeDir, "caches/redditvanced")
 
 	internal val apkFile: File
-		get() = File(cacheDir, "discord-${projectRedditVersion.get()}.apk")
+		get() = File(cacheDir, "reddit-${projectRedditVersion.get()}-main.apk")
 
 	internal val jarFile: File
-		get() = File(cacheDir, "discord-${projectRedditVersion.get()}-sources.apk")
+		get() = File(cacheDir, "reddit-${projectRedditVersion.get()}-main.jar")
 }
 
 internal fun ExtensionContainer.getRedditVanced() =

@@ -30,10 +30,11 @@ abstract class GenSourcesTask : DefaultTask() {
 	@TaskAction
 	fun genSources() {
 		val extension = project.extensions.getRedditVanced()
+		val sourcesJar = File(extension.cacheDir, "reddit-${extension.projectRedditVersion.get()}-sources.jar")
 
 		val args = JadxArgs()
 		args.setInputFile(extension.apkFile)
-		args.outDirSrc = File(extension.cacheDir, "reddit-${extension.projectRedditVersion}-sources.jar")
+		args.outDirSrc = sourcesJar
 		args.isSkipResources = true
 		args.isShowInconsistentCode = true
 		args.isRespectBytecodeAccModifiers = true
