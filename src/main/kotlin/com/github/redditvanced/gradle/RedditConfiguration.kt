@@ -2,21 +2,20 @@ package com.github.redditvanced.gradle
 
 import com.github.kittinunf.fuel.gson.responseObject
 import com.github.kittinunf.fuel.httpGet
-import com.github.redditvanced.gradle.models.RedditAPK
+import com.github.redditvanced.gradle.models.AccountCredentials
 import com.github.redditvanced.gradle.models.RemoteData
 import com.github.redditvanced.gradle.utils.createProgressLogger
-import com.github.redditvanced.gradle.utils.download
+import com.github.redditvanced.gradle.utils.downloadFromStream
+import com.github.theapache64.gpa.api.Play
 import com.googlecode.d2j.dex.Dex2jar
 import com.googlecode.d2j.reader.MultiDexFileReader
+import kotlinx.coroutines.runBlocking
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.internal.impldep.com.google.gson.Gson
-import java.io.*
-import java.net.URL
 import java.nio.file.Files
-import java.util.zip.ZipFile
 
 private const val DATA_URL = "https://raw.githubusercontent.com/RedditVanced/RedditVanced/builds/data.json"
-private const val APK_URL = "https://redditvanced.app/reddit/%s"
 
 fun configureRedditConfiguration(project: Project) {
 	val extension = project.extensions.getRedditVanced()
@@ -38,30 +37,34 @@ fun configureRedditConfiguration(project: Project) {
 					project.logger.lifecycle("Fetched Reddit version: ${data.latestRedditVersionName} (${data.latestRedditVersionCode})")
 					data.latestRedditVersionCode
 				}
-				else -> it.version
+				else -> it.version?.toIntOrNull()
+					?: throw GradleException("Invalid Reddit APK version code")
 			}
 
-			val tmpApkFile = File(System.getProperty("java.io.tmpdir"), "reddit-${version}-tmp.xapk")
 			extension.cacheDir.mkdirs()
 
 			if (!extension.apkFile.exists()) {
-				project.logger.lifecycle("Downloading Reddit APK")
-				val url = URL(APK_URL.format(version))
-				val reader = BufferedReader(InputStreamReader(url.openStream()))
-				val data = gson.fromJson(reader, RedditAPK::class.java)
+				project.logger.lifecycle("Getting Google credentials (dummy account)")
+				val credentials = "${extension.redditVancedBackend.get()}/google"
+					.httpGet()
+					.set("User-Agent", "RedditVanced")
+					.responseObject<AccountCredentials>().third.get()
 
-				URL(data.downloadUrl).download(tmpApkFile, createProgressLogger(project, "Download Reddit APK"))
-
-				project.logger.lifecycle("Extracting main apk from xapk")
-				val zip = ZipFile(tmpApkFile)
-				val stream = zip.getInputStream(zip.getEntry("com.reddit.frontpage.apk"))
-
-				extension.apkFile.outputStream().use { outStream ->
-					stream.copyTo(outStream)
-					outStream.close()
+				project.logger.lifecycle("Logging into Google")
+				val account = runBlocking {
+					Play.login(credentials.username, credentials.password)
 				}
-				stream.close()
-				tmpApkFile.delete()
+				val play = Play.getApi(account)
+
+				project.logger.lifecycle("Retrieving APK details from Google Play")
+				val apk = runBlocking {
+					play.delivery("com.reddit.frontpage", version, 1)
+						?: throw GradleException("Failed to retrieve APK details (null)")
+				}
+
+				project.logger.lifecycle("Downloading main part of Reddit APK")
+				// TODO: check if correct size
+				downloadFromStream(apk.openApp(), apk.appSize, extension.apkFile, createProgressLogger(project, "Download Reddit APK"))
 			}
 
 			if (!extension.jarFile.exists()) {

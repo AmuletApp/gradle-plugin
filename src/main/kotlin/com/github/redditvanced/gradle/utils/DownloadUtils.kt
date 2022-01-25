@@ -24,7 +24,7 @@ import org.gradle.internal.logging.progress.ProgressLoggerFactory
 import org.gradle.internal.service.ServiceRegistry
 import java.io.File
 import java.io.FileOutputStream
-import java.net.URL
+import java.io.InputStream
 
 fun createProgressLogger(project: Project, loggerCategory: String): ProgressLogger {
 	return createProgressLogger((project as ProjectInternal).services, loggerCategory)
@@ -35,40 +35,33 @@ fun createProgressLogger(services: ServiceRegistry, loggerCategory: String): Pro
 	return progressLoggerFactory.newOperation(loggerCategory).also { it.description = loggerCategory }
 }
 
-fun URL.download(file: File, progressLogger: ProgressLogger) {
+fun downloadFromStream(stream: InputStream, size: Long, output: File, progressLogger: ProgressLogger) {
+	val tempFile = File.createTempFile(output.name, ".part", output.parentFile)
 	progressLogger.started()
+
+	var finished = false
 	try {
-		val tempFile = File.createTempFile(file.name, ".part", file.parentFile)
-		tempFile.deleteOnExit()
-
-		val connection = this.openConnection()
-		val size = connection.contentLengthLong
-		val sizeText = toLengthText(size)
-
-		connection.getInputStream().use { inputStream ->
-			var finished = false
-			var processedBytes: Long = 0
-			try {
-				FileOutputStream(tempFile).use { os ->
-					val buf = ByteArray(1024 * 10)
-					var read: Int
-					while (inputStream.read(buf).also { read = it } >= 0) {
-						os.write(buf, 0, read)
-						processedBytes += read
-						progressLogger.progress("Downloading discord apk ${toLengthText(processedBytes)}/$sizeText")
-					}
-					os.flush()
-					finished = true
-				}
-			} finally {
-				if (finished) {
-					tempFile.renameTo(file)
-				} else {
-					tempFile.delete()
-				}
+		var processedBytes: Long = 0
+		FileOutputStream(tempFile).use { os ->
+			val buf = ByteArray(1024 * 10)
+			var read: Int
+			while (stream.read(buf).also { read = it } >= 0) {
+				os.write(buf, 0, read)
+				processedBytes += read
+				progressLogger.progress("Downloading discord apk ${toLengthText(processedBytes)}/$size")
 			}
+			os.flush()
+			finished = true
 		}
+	} catch (t: Throwable) {
+		tempFile.delete()
+		progressLogger.completed(t.message, true)
+
+		throw t
 	} finally {
+		if (finished) tempFile.renameTo(output)
+		else tempFile.delete()
+		stream.close()
 		progressLogger.completed()
 	}
 }
