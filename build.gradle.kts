@@ -27,9 +27,9 @@ dependencies {
 	implementation("com.github.kittinunf.fuel:fuel-gson:2.3.1")
 
 	// APK utils
-    implementation("com.github.RedditVanced.dex2jar:dex-translator:6ca3abf245")
-    implementation("com.github.Aliucord.jadx:jadx-core:1a213e978d")
-    implementation("com.github.Aliucord.jadx:jadx-dex-input:1a213e978d")
+    implementation("com.github.RedditVanced.dex2jar:dex-translator:main-SNAPSHOT")
+    implementation("com.github.Aliucord.jadx:jadx-core:master-SNAPSHOT")
+    implementation("com.github.Aliucord.jadx:jadx-dex-input:master-SNAPSHOT")
     implementation("com.github.js6pak:jadb:fix-modified-time-SNAPSHOT")
 
 	// GPlay API
