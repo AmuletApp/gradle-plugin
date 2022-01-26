@@ -22,6 +22,8 @@ abstract class Plugin : Plugin<Project> {
 
 		configureRedditConfiguration(project)
 
+		if (extension.projectType.get() == ProjectType.REGULAR) return
+
 		val intermediates = project.buildDir.resolve("intermediates")
 
 		project.tasks.register("compileResources", CompileResourcesTask::class.java) { task ->
