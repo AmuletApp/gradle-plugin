@@ -24,9 +24,11 @@ fun configureRedditConfiguration(project: Project) {
 	}
 	project.afterEvaluate {
 		val dependencies = project.configurations.getByName("redditApk").dependencies
+		if (dependencies.size == 0) return@afterEvaluate
 		require(dependencies.size == 1) {
-			"Only one Reddit APK dependency is allowed per project!"
+			"Only one Reddit APK dependency is allowed per project but ${dependencies.size} were present!"
 		}
+
 		val dependency = dependencies.single()
 
 		val version = when (dependency.version) {
