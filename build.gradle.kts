@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.10")
-	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt")
     compileOnly(gradleApi())
 
 	// Build utils
@@ -27,7 +27,7 @@ dependencies {
 	implementation("com.github.kittinunf.fuel:fuel-gson:2.3.1")
 
 	// APK utils
-    implementation("com.github.Aliucord.dex2jar:dex-translator:d5a5efb06c")
+    implementation("com.github.RedditVanced.dex2jar:dex-translator:6ca3abf245")
     implementation("com.github.Aliucord.jadx:jadx-core:1a213e978d")
     implementation("com.github.Aliucord.jadx:jadx-dex-input:1a213e978d")
     implementation("com.github.js6pak:jadb:fix-modified-time-SNAPSHOT")
