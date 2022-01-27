@@ -8,8 +8,8 @@ group = "com.github.redditvanced"
 version = "1.0.0"
 
 repositories {
-    mavenCentral()
     google()
+    mavenCentral()
     maven("https://jitpack.io")
 }
 
