@@ -24,7 +24,31 @@ abstract class RequestPublishPluginTask : DefaultTask() {
 			ynConfirm()
 		}
 
-		val (_, _, result) = "$baseUrl/publishPlugin/${project.name}".httpPost().response()
+		if (getRemoteURL("upstream").isNotEmpty()) {
+			logger.error("You cannot publish a plugin from a fork!")
+			exitProcess(1)
+		}
+
+		val origin = getRemoteURL("origin")
+		if (origin.isEmpty()) {
+			logger.error("No remote origin detected! Please publish this repository to GitHub!")
+			exitProcess(1)
+		}
+
+		val originMatch = "^(?:git@|https://)github.com[:/](.*).git$"
+			.toRegex()
+			.find(origin)
+			?.groupValues
+			?.first()
+			?.split('/')
+
+		if (originMatch == null || originMatch.size != 2) {
+			logger.error("Could not determine repository from origin $origin. Expecting a format of https://github.com/xxxxx/xxxxx.git")
+			exitProcess(1)
+		}
+
+		val (owner, repo) = originMatch
+		val (_, _, result) = "$baseUrl/publish/$owner/$repo?plugin=${project.name}&targetCommit=${getGitHash()}".httpPost().response()
 
 		when (result) {
 			is Result.Failure ->
@@ -33,6 +57,9 @@ abstract class RequestPublishPluginTask : DefaultTask() {
 				logger.info("Successfully requested publish for plugin ${project.name}")
 		}
 	}
+
+	private fun getRemoteURL(remote: String) =
+		exec("git config --get remote.$remote.url")
 
 	private fun getCurrentBranch(): String =
 		exec("git name-rev --name-only HEAD")
