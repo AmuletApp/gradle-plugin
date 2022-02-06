@@ -59,9 +59,11 @@ abstract class Plugin : Plugin<Project> {
 		project.tasks.register("compileDex", CompileDexTask::class.java) { task ->
 			task.group = TASK_GROUP
 
+			task.outputFile.set(intermediates.resolve("classes.dex"))
+
 			val kotlinTask = project.tasks.getByName("compileDebugKotlin") as AbstractCompile
-			task.dependsOn(kotlinTask)
 			task.input.from(kotlinTask.destinationDirectory)
+			task.dependsOn(kotlinTask)
 		}
 
 		project.tasks.register("genSources", GenSourcesTask::class.java) { task ->
@@ -133,11 +135,9 @@ abstract class Plugin : Plugin<Project> {
 			task.dependsOn("make")
 		}
 
-		if (extension.projectType.get() == ProjectType.PLUGIN) {
-			project.tasks.register("requestPublishPlugin", RequestPublishPluginTask::class.java) { task ->
-				task.group = TASK_GROUP
-				task.enabled = extension.projectType.get() == ProjectType.PLUGIN
-			}
+		project.tasks.register("requestPublishPlugin", RequestPublishPluginTask::class.java) { task ->
+			task.group = TASK_GROUP
+			task.enabled = extension.projectType.get() == ProjectType.PLUGIN
 		}
 	}
 }

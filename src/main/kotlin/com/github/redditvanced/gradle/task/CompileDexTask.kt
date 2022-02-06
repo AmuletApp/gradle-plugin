@@ -6,13 +6,14 @@ import com.android.builder.dexing.ClassFileInputs
 import com.android.builder.dexing.DexArchiveBuilder
 import com.android.builder.dexing.DexParameters
 import com.android.builder.dexing.r8.ClassFileProviderFactory
+import com.github.redditvanced.gradle.ProjectType
 import com.github.redditvanced.gradle.getAndroid
 import com.github.redditvanced.gradle.getRedditVanced
+import com.google.common.io.Closer
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.*
-import org.gradle.internal.impldep.com.google.common.io.Closer
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.tree.ClassNode
 import org.slf4j.LoggerFactory
@@ -69,29 +70,31 @@ abstract class CompileDexTask : DefaultTask() {
 			dexOutputDir.toPath()
 		)
 
-		for (file in files) {
-			val reader = ClassReader(file.readAllBytes())
+		if (redditvanced.projectType.get() == ProjectType.PLUGIN) {
+			for (file in files) {
+				val reader = ClassReader(file.readAllBytes())
 
-			val classNode = ClassNode()
-			reader.accept(classNode, 0)
+				val classNode = ClassNode()
+				reader.accept(classNode, 0)
 
-			for (annotation in classNode.visibleAnnotations.orEmpty() + classNode.invisibleAnnotations.orEmpty()) {
-				if (annotation.desc == "Lcom/github/redditvanced/annotations/RedditVancedPlugin;") {
-					require(!redditvanced.pluginClass.isPresent) { "Only 1 active plugin class per project is supported" }
-					redditvanced.pluginClass.set(classNode.name.replace('/', '.'))
+				for (annotation in classNode.visibleAnnotations.orEmpty() + classNode.invisibleAnnotations.orEmpty()) {
+					if (annotation.desc == "Lcom/github/redditvanced/annotations/RedditVancedPlugin;") {
+						require(!redditvanced.pluginClass.isPresent) { "Only 1 active plugin class per project is supported" }
+						redditvanced.pluginClass.set(classNode.name.replace('/', '.'))
 
-					annotation.values.chunked(2).forEach {
-						when (it[0]) {
-							"loadResources" -> redditvanced.loadResources.set(it[1] as Boolean)
-							"requiresRestart" -> redditvanced.requiresRestart.set(it[1] as Boolean)
+						annotation.values.chunked(2).forEach {
+							when (it[0]) {
+								"loadResources" -> redditvanced.loadResources.set(it[1] as Boolean)
+								"requiresRestart" -> redditvanced.requiresRestart.set(it[1] as Boolean)
+							}
 						}
 					}
 				}
 			}
-		}
 
-		require(redditvanced.pluginClass.isPresent) {
-			"No plugin class found, make sure your plugin class is annotated with @RedditVancedPlugin"
+			require(redditvanced.pluginClass.isPresent) {
+				"No plugin class found, make sure your plugin class is annotated with @RedditVancedPlugin"
+			}
 		}
 
 		logger.lifecycle("Compiled dex to ${outputFile.get()}")

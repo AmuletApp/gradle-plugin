@@ -21,6 +21,7 @@ dependencies {
 	// Build utils
 	compileOnly("com.android.tools:sdk-common:30.0.0")
     compileOnly("com.android.tools.build:gradle:7.0.0")
+	compileOnly("com.google.guava:guava:31.0.1-jre")
 
 	// HTTP Lib
 	implementation("com.github.kittinunf.fuel:fuel:2.3.1")
@@ -34,7 +35,7 @@ dependencies {
 
 	// GPlay API
 	implementation("com.github.theapache64:google-play-api:0.0.9")
-	implementation("com.google.protobuf:protobuf-java:3.19.3")
+	implementation("com.google.protobuf:protobuf-java:3.19.4")
 }
 
 gradlePlugin {
