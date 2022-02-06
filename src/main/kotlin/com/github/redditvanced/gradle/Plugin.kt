@@ -1,6 +1,7 @@
 package com.github.redditvanced.gradle
 
 import com.android.build.gradle.tasks.ProcessLibraryManifest
+import com.github.redditvanced.gradle.models.CoreManifest
 import com.github.redditvanced.gradle.models.PluginManifest
 import com.github.redditvanced.gradle.task.*
 import groovy.json.JsonBuilder
@@ -80,24 +81,32 @@ abstract class Plugin : Plugin<Project> {
 			val compileDexTask = project.tasks.getByName("compileDex") as CompileDexTask
 			task.dependsOn(compileDexTask)
 
-			if (extension.projectType.get() == ProjectType.PLUGIN) {
+			val projectType = extension.projectType.get()
+			if (projectType == ProjectType.PLUGIN || projectType == ProjectType.CORE) {
 				val manifestFile = intermediates.resolve("manifest.json")
 
 				task.from(manifestFile)
 				task.doFirst {
 					require(project.version != "unspecified") { "No project version is set!" }
 
-					val manifest = PluginManifest(
-						name = project.name,
-						version = project.version.toString(),
-						pluginClass = extension.pluginClass.get(),
-						changelog = extension.changelog.getOrElse(""),
-						description = project.description ?: "",
-						authors = extension.authors.get(),
-						customUpdaterUrl = extension.customUpdaterUrl.orNull,
-						loadResources = extension.loadResources.get(),
-						requiresRestart = extension.requiresRestart.get()
-					)
+					val manifest: Any = if (projectType == ProjectType.PLUGIN) {
+						PluginManifest(
+							name = project.name,
+							version = project.version.toString(),
+							pluginClass = extension.pluginClass.get(),
+							changelog = extension.changelog.getOrElse(""),
+							description = project.description ?: "",
+							authors = extension.authors.get(),
+							customUpdaterUrl = extension.customUpdaterUrl.orNull,
+							loadResources = extension.loadResources.get(),
+							requiresRestart = extension.requiresRestart.get()
+						)
+					} else {
+						CoreManifest(
+							version = project.version.toString(),
+							redditVersionCode = extension.projectRedditVersion.get()
+						)
+					}
 					manifestFile.writeText(JsonBuilder(manifest).toString())
 				}
 			}
