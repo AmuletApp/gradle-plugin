@@ -45,6 +45,10 @@ abstract class GenSourcesTask : DefaultTask() {
 
 		args.codeCache = NoOpCodeCache()
 		args.codeWriterProvider = Function { SimpleCodeWriter(it) }
+		args.threadsCount = Runtime.getRuntime()
+			.availableProcessors()
+			.times(0.80f).toInt()
+			.coerceAtLeast(1)
 
 		JadxDecompiler(args).use { decompiler ->
 			decompiler.load()
