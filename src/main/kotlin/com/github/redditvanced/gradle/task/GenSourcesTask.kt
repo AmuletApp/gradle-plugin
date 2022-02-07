@@ -20,7 +20,6 @@ import jadx.api.JadxArgs
 import jadx.api.JadxDecompiler
 import jadx.api.impl.NoOpCodeCache
 import jadx.api.impl.SimpleCodeWriter
-import jadx.plugins.input.dex.DexInputPlugin
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import java.io.File
@@ -39,7 +38,6 @@ abstract class GenSourcesTask : DefaultTask() {
 		args.isShowInconsistentCode = true
 		args.isRespectBytecodeAccModifiers = true
 		args.isFsCaseSensitive = true
-		args.isGenerateKotlinMetadata = true
 		args.isDebugInfo = false
 		args.isInlineAnonymousClasses = false
 		args.isInlineMethods = false
@@ -49,7 +47,6 @@ abstract class GenSourcesTask : DefaultTask() {
 		args.codeWriterProvider = Function { SimpleCodeWriter(it) }
 
 		JadxDecompiler(args).use { decompiler ->
-			decompiler.registerPlugin(DexInputPlugin())
 			decompiler.load()
 			decompiler.save()
 		}

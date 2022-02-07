@@ -29,8 +29,8 @@ dependencies {
 
 	// APK utils
     implementation("com.github.RedditVanced.dex2jar:dex-translator:main-SNAPSHOT")
-    implementation("com.github.Aliucord.jadx:jadx-core:master-SNAPSHOT")
-    implementation("com.github.Aliucord.jadx:jadx-dex-input:master-SNAPSHOT")
+    implementation("com.github.RedditVanced.jadx:jadx-core:master-SNAPSHOT")
+    implementation("com.github.RedditVanced.jadx:jadx-dex-input:master-SNAPSHOT")
     implementation("com.github.js6pak:jadb:fix-modified-time-SNAPSHOT")
 
 	// GPlay API
