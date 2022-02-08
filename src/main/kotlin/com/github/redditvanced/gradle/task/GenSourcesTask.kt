@@ -1,18 +1,3 @@
-/*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- */
-
 package com.github.redditvanced.gradle.task
 
 import com.github.redditvanced.gradle.getRedditVanced
@@ -31,24 +16,25 @@ abstract class GenSourcesTask : DefaultTask() {
 		val extension = project.extensions.getRedditVanced()
 		val sourcesJar = File(extension.cacheDir, "reddit-${extension.projectRedditVersion.get()}-sources.jar")
 
-		val args = JadxArgs()
-		args.setInputFile(extension.apkFile)
-		args.outDirSrc = sourcesJar
-		args.isSkipResources = true
-		args.isShowInconsistentCode = true
-		args.isRespectBytecodeAccModifiers = true
-		args.isFsCaseSensitive = true
-		args.isDebugInfo = false
-		args.isInlineAnonymousClasses = false
-		args.isInlineMethods = false
-		args.isReplaceConsts = true
+		val args = JadxArgs().apply {
+			setInputFile(extension.apkFile)
+			outDirSrc = sourcesJar
+			isSkipResources = true
+			isShowInconsistentCode = true
+			isRespectBytecodeAccModifiers = true
+			isFsCaseSensitive = true
+			isDebugInfo = false
+			isInlineAnonymousClasses = false
+			isInlineMethods = false
+			isReplaceConsts = true
 
-		args.codeCache = NoOpCodeCache()
-		args.codeWriterProvider = Function { SimpleCodeWriter(it) }
-		args.threadsCount = Runtime.getRuntime()
-			.availableProcessors()
-			.times(0.80f).toInt()
-			.coerceAtLeast(1)
+			codeCache = NoOpCodeCache()
+			codeWriterProvider = Function { SimpleCodeWriter(it) }
+			threadsCount = Runtime.getRuntime()
+				.availableProcessors()
+				.times(0.80f).toInt()
+				.coerceAtLeast(1)
+		}
 
 		JadxDecompiler(args).use { decompiler ->
 			decompiler.load()
