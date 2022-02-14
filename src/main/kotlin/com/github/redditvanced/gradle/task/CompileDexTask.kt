@@ -78,11 +78,11 @@ abstract class CompileDexTask : DefaultTask() {
 				reader.accept(classNode, 0)
 
 				for (annotation in classNode.visibleAnnotations.orEmpty() + classNode.invisibleAnnotations.orEmpty()) {
-					if (annotation.desc == "Lcom/github/redditvanced/annotations/RedditVancedPlugin;") {
+					if (annotation.desc == "Lcom/github/redditvanced/core/annotations/RedditVancedPlugin;") {
 						require(!redditvanced.pluginClass.isPresent) { "Only 1 active plugin class per project is supported" }
 						redditvanced.pluginClass.set(classNode.name.replace('/', '.'))
 
-						annotation.values.chunked(2).forEach {
+						annotation.values?.chunked(2)?.forEach {
 							when (it[0]) {
 								"loadResources" -> redditvanced.loadResources.set(it[1] as Boolean)
 								"requiresRestart" -> redditvanced.requiresRestart.set(it[1] as Boolean)

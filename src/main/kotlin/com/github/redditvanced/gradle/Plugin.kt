@@ -98,8 +98,8 @@ abstract class Plugin : Plugin<Project> {
 							description = project.description ?: "",
 							authors = extension.authors.get(),
 							customUpdaterUrl = extension.customUpdaterUrl.orNull,
-							loadResources = extension.loadResources.get(),
-							requiresRestart = extension.requiresRestart.get()
+							loadResources = extension.loadResources.getOrElse(false),
+							requiresRestart = extension.requiresRestart.getOrElse(false),
 						)
 					} else {
 						CoreManifest(
