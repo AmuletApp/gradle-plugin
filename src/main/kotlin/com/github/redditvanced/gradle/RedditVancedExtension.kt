@@ -77,4 +77,16 @@ internal fun ExtensionContainer.getRedditVanced() =
 	getByType(RedditVancedExtension::class.java)
 
 internal fun ExtensionContainer.getAndroid() =
-	getByName("android") as BaseExtension
+	getByType(BaseExtension::class.java)
+
+/**
+ * Configure the Android plugin for this project
+ */
+fun Project.android(configuration: BaseExtension.() -> Unit) =
+	extensions.getAndroid().configuration()
+
+/**
+ * Configure RedditVanced for this project
+ */
+fun Project.redditVanced(configuration: RedditVancedExtension.() -> Unit) =
+	extensions.getRedditVanced().configuration()
