@@ -14,6 +14,11 @@ abstract class DeployWithAdbTask : DefaultTask() {
 
 	@TaskAction
 	fun deployWithAdb() {
+		if (project.name == "Template") {
+			project.logger.warn("Ignoring deploy for Template plugin!")
+			return
+		}
+
 		val extension = project.extensions.getRedditVanced()
 
 		val make = project.tasks.getByName("make") as AbstractCopyTask
