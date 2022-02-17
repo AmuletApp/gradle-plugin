@@ -43,8 +43,8 @@ abstract class RedditVancedExtension(project: Project) {
 	/**
 	 * Override the domain for fetching reddit versions and publishing plugins.
 	 */
-	var redditVancedBackend: Property<String> =
-		project.objects.property(String::class.java).convention("https://redditvanced.domain")
+	var backendUrl: Property<String> =
+		project.objects.property(String::class.java).convention("https://redditvanced.ddns.net")
 
 	/**
 	 * The class that's annotated with `@RedditVancedPlugin`

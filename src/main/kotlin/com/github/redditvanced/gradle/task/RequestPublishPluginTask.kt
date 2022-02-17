@@ -12,7 +12,7 @@ abstract class RequestPublishPluginTask : DefaultTask() {
 	@TaskAction
 	fun publishPlugin() {
 		val extension = project.extensions.getRedditVanced()
-		val baseUrl = extension.redditVancedBackend.get()
+		val baseUrl = extension.backendUrl.get()
 
 		if (gitHasLocalCommit()) {
 			logger.lifecycle("Your git repository has local commits! Are you sure you want to continue?")

@@ -74,8 +74,7 @@ abstract class Plugin : Plugin<Project> {
 		project.tasks.register(
 			"make",
 			if (extension.projectType.get() == ProjectType.INJECTOR) Copy::class.java else Zip::class.java
-		)
-		{ task ->
+		) { task ->
 			task.group = TASK_GROUP
 
 			val compileDexTask = project.tasks.getByName("compileDex") as CompileDexTask

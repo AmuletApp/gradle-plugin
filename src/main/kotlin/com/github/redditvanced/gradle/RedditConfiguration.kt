@@ -49,7 +49,7 @@ fun configureRedditConfiguration(project: Project) {
 
 		if (!extension.apkFile.exists()) {
 			project.logger.lifecycle("Getting Google credentials (dummy account)")
-			val credentials = "${extension.redditVancedBackend.get()}/google"
+			val credentials = "${extension.backendUrl.get()}/google"
 				.httpGet()
 				.set("User-Agent", "RedditVanced")
 				.responseObject<AccountCredentials>().third.get()
