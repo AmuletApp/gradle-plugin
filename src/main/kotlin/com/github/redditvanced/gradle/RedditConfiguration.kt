@@ -47,7 +47,7 @@ fun configureRedditConfiguration(project: Project) {
 
 		extension.cacheDir.mkdirs()
 
-		if (!extension.apkFile.exists()) {
+		if (!extension.apkFile.exists() && !extension.jarFile.exists()) {
 			project.logger.lifecycle("Getting Google credentials (dummy account)")
 			val credentials = "${extension.backendUrl.get()}/google"
 				.httpGet()

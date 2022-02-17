@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.github.redditvanced"
-version = "1.0.2"
+version = "1.0.3"
 
 repositories {
     google()
