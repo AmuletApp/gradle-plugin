@@ -67,8 +67,15 @@ fun configureRedditConfiguration(project: Project) {
 			}
 
 			project.logger.lifecycle("Downloading main part of Reddit APK")
+			val stream = try {
+				apk.openApp()
+			} catch (t: Throwable) {
+				t.printStackTrace()
+				throw GradleException("Failed to checkout Reddit apk from GPlay!")
+			}
+
 			// TODO: check if correct size
-			downloadFromStream(apk.openApp(), apk.appSize, extension.apkFile, createProgressLogger(project, "Download Reddit APK"))
+			downloadFromStream(stream, apk.appSize, extension.apkFile, createProgressLogger(project, "Download Reddit APK"))
 		}
 
 		if (!extension.jarFile.exists()) {
