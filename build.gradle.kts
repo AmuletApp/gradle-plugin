@@ -65,7 +65,7 @@ publishing {
 				this.username = username
 				this.password = password
 			}
-			setUrl("https://redditvanced.ddns.net/releases")
+			setUrl("https://redditvanced.ddns.net/maven/releases")
 		}
 	}
 }
