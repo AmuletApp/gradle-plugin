@@ -36,3 +36,7 @@ ij_kotlin_name_count_to_use_star_import_for_members = 3
 ij_kotlin_keep_first_column_comment = false
 ij_kotlin_line_comment_add_space = true
 ij_kotlin_line_comment_at_first_column = false
+
+[*.yml]
+indent_style = space
+indent_size = 2
