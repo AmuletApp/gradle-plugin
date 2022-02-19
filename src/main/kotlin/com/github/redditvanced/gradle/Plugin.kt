@@ -124,9 +124,6 @@ abstract class Plugin : Plugin<Project> {
 			} else {
 				task as Zip
 
-				if (projectType == ProjectType.CORE)
-					task.rename { "core.zip" }
-
 				task.dependsOn(project.tasks.getByName("compileResources"))
 				task.isPreserveFileTimestamps = false
 				task.archiveBaseName.set(project.name)
