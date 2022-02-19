@@ -53,6 +53,12 @@ java {
 }
 
 publishing {
+	publications {
+		register(project.name, MavenPublication::class) {
+			artifact(tasks["kotlinSourcesJar"])
+		}
+	}
+
 	repositories {
 		val username = System.getenv("MAVEN_USERNAME")
 		val password = System.getenv("MAVEN_PASSWORD")
