@@ -32,6 +32,7 @@ abstract class Plugin : Plugin<Project> {
 		val intermediates = project.buildDir.resolve("intermediates")
 		val android = project.extensions.getAndroid()
 		val extension = project.extensions.getRedditVanced()
+		val projectType = extension.projectType.get()
 
 		project.tasks.register("compileResources", CompileResourcesTask::class.java) { task ->
 			task.group = TASK_GROUP
@@ -71,16 +72,17 @@ abstract class Plugin : Plugin<Project> {
 			task.group = TASK_GROUP
 		}
 
-		project.tasks.register(
-			"make",
-			if (extension.projectType.get() == ProjectType.INJECTOR) Copy::class.java else Zip::class.java
-		) { task ->
+		val makeTaskType = when (projectType) {
+			ProjectType.INJECTOR -> Copy::class.java
+			else -> Zip::class.java
+		}
+
+		project.tasks.register("make", makeTaskType) { task ->
 			task.group = TASK_GROUP
 
 			val compileDexTask = project.tasks.getByName("compileDex") as CompileDexTask
 			task.dependsOn(compileDexTask)
 
-			val projectType = extension.projectType.get()
 			if (projectType == ProjectType.PLUGIN || projectType == ProjectType.CORE) {
 				val manifestFile = intermediates.resolve("manifest.json")
 
@@ -112,15 +114,19 @@ abstract class Plugin : Plugin<Project> {
 
 			task.from(compileDexTask.outputFile)
 
-			if (extension.projectType.get() == ProjectType.INJECTOR) {
+			if (projectType == ProjectType.INJECTOR) {
 				task.into(project.buildDir)
-				task.rename { "Injector.dex" }
+				task.rename { "injector.dex" }
 
 				task.doLast {
 					task.logger.lifecycle("Copied Injector.dex to ${project.buildDir}")
 				}
 			} else {
 				task as Zip
+
+				if (projectType == ProjectType.CORE)
+					task.rename { "core.zip" }
+
 				task.dependsOn(project.tasks.getByName("compileResources"))
 				task.isPreserveFileTimestamps = false
 				task.archiveBaseName.set(project.name)
