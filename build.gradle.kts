@@ -5,11 +5,12 @@ plugins {
 }
 
 group = "com.github.redditvanced"
-version = "1.0.5"
+version = "1.0.6"
 
 repositories {
 	google()
 	mavenCentral()
+	maven("https://redditvanced.ddns.net/maven/releases")
 	maven("https://jitpack.io")
 }
 
@@ -29,9 +30,9 @@ dependencies {
 
 	// APK utils
 	implementation("com.github.RedditVanced.dex2jar:dex-translator:main-SNAPSHOT")
-	implementation("com.github.RedditVanced.jadx:jadx-core:master-SNAPSHOT")
-	implementation("com.github.RedditVanced.jadx:jadx-dex-input:master-SNAPSHOT")
-	implementation("com.github.js6pak:jadb:fix-modified-time-SNAPSHOT")
+	implementation("io.github.skylot:jadx-core:1.3.2")
+	implementation("io.github.skylot:jadx-dex-input:1.3.2")
+	implementation("com.github.vidstige:jadb:master-SNAPSHOT")
 
 	// GPlay API
 	implementation("com.github.theapache64:google-play-api:0.0.9")
