@@ -22,7 +22,7 @@ abstract class DeployWithAdbTask : DefaultTask() {
 		val extension = project.extensions.getRedditVanced()
 
 		val make = project.tasks.getByName("make") as AbstractCopyTask
-		val buildFile = make.outputs.files.singleFile
+		val buildFile = make.outputs.files.first()
 
 		val device = AdbUtils.getTargetDevice(project)
 

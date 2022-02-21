@@ -116,11 +116,11 @@ abstract class Plugin : Plugin<Project> {
 
 			if (projectType == ProjectType.INJECTOR) {
 				task.into(project.buildDir)
-				task.rename { "injector.dex" }
+				task.rename { "Injector.dex" }
 
-				task.doLast {
-					task.logger.lifecycle("Copied Injector.dex to ${project.buildDir}")
-				}
+				// Retarded gradle won't remove the target dir as an output
+				// Absolutely fuming
+				task.outputs.file("${project.buildDir}/Injector.dex")
 			} else {
 				task as Zip
 
@@ -129,10 +129,10 @@ abstract class Plugin : Plugin<Project> {
 				task.archiveBaseName.set(project.name)
 				task.archiveVersion.set("")
 				task.destinationDirectory.set(project.buildDir)
+			}
 
-				task.doLast {
-					task.logger.lifecycle("Made RedditVanced package at ${task.outputs.files.singleFile}")
-				}
+			task.doLast {
+				task.logger.lifecycle("Made package at ${task.outputs.files.first().absolutePath}")
 			}
 		}
 

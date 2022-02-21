@@ -63,7 +63,9 @@ abstract class CompileDexTask : DefaultTask() {
 			inputs.entries { _, _ -> true }
 		}.toTypedArray()
 
-		val files = Arrays.stream(fileStreams).flatMap { it }.collect(Collectors.toList())
+		val files = Arrays.stream(fileStreams)
+			.flatMap { it }
+			.collect(Collectors.toList())
 
 		dexBuilder.convert(
 			files.stream(),
@@ -96,7 +98,5 @@ abstract class CompileDexTask : DefaultTask() {
 				"No plugin class found, make sure your plugin class is annotated with @RedditVancedPlugin"
 			}
 		}
-
-		logger.lifecycle("Compiled dex to ${outputFile.get()}")
 	}
 }
