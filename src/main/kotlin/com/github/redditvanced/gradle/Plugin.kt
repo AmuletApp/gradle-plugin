@@ -118,8 +118,11 @@ abstract class Plugin : Plugin<Project> {
 			project.tasks.register("make", Zip::class.java) { task ->
 				task.group = TASK_GROUP
 
-				val compileDexTask = project.tasks.getByName("compileDex") as CompileDexTask
-				task.dependsOn(compileDexTask)
+				val compileDex = project.tasks.getByName("compileDex") as CompileDexTask
+				task.dependsOn(compileDex)
+				task.from(compileDex.outputFile)
+
+				task.dependsOn(project.tasks.getByName("compileResources"))
 
 				if (projectType == ProjectType.PLUGIN || projectType == ProjectType.CORE) {
 					val manifestFile = intermediates.resolve("manifest.json")
@@ -150,12 +153,13 @@ abstract class Plugin : Plugin<Project> {
 					}
 				}
 
-				task.from(compileDexTask.outputFile)
-				task.dependsOn(project.tasks.getByName("compileResources"))
 				task.isPreserveFileTimestamps = false
 				task.archiveBaseName.set(project.name)
 				task.archiveVersion.set("")
 				task.destinationDirectory.set(project.buildDir)
+
+				if (projectType == ProjectType.PLUGIN)
+					task.archiveExtension.set("rvanced")
 
 				task.doLast {
 					task.logger.lifecycle("Made package at ${task.outputs.files.first().absolutePath}")
