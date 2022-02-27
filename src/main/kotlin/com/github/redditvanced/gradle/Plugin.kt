@@ -63,9 +63,11 @@ abstract class Plugin : Plugin<Project> {
 
 			task.outputFile.set(intermediates.resolve("classes.dex"))
 
-			val kotlinTask = project.tasks.getByName("compileDebugKotlin") as AbstractCompile
-			task.input.from(kotlinTask.destinationDirectory)
-			task.dependsOn(kotlinTask)
+			for (taskName in listOf("compileDebugJavaWithJavac", "compileDebugKotlin")) {
+				val compileTask = project.tasks.getByName(taskName) as AbstractCompile
+				task.input.from(compileTask.destinationDirectory)
+				task.dependsOn(compileTask)
+			}
 		}
 
 		project.tasks.register("genSources", GenSourcesTask::class.java) { task ->
