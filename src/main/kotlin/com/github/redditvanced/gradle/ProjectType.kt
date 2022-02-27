@@ -24,7 +24,7 @@ enum class ProjectType {
 	fun getRemotePath(buildFile: File): String {
 		return "/storage/emulated/0/RedditVanced/" + when (this) {
 			PLUGIN -> "plugins/${buildFile.name}"
-			INJECTOR -> "build/injector.dex"
+			INJECTOR -> "build/injector.zip"
 			CORE -> "build/core.zip"
 			REGULAR -> throw IllegalStateException("Regular projects do not have a remote path!")
 		}
