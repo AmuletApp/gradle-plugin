@@ -48,7 +48,7 @@ abstract class RequestPublishPluginTask : DefaultTask() {
 		}
 
 		val (owner, repo) = originMatch
-		val (_, _, result) = "$baseUrl/publish/$owner/$repo?plugin=${project.name}&targetCommit=${getGitHash()}".httpPost().response()
+		val (_, _, result) = "$baseUrl/publish/$owner/$repo?plugin=${project.name}".httpPost().response()
 
 		when (result) {
 			is Result.Failure ->
@@ -69,9 +69,6 @@ abstract class RequestPublishPluginTask : DefaultTask() {
 
 	private fun gitHasChanges(): Boolean =
 		exec("git status -s").isNotEmpty()
-
-	private fun getGitHash(): String =
-		exec("git rev-parse HEAD")
 
 	private fun exec(command: String): String {
 		val proc = ProcessBuilder(command)

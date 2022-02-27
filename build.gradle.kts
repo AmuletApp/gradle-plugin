@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.github.redditvanced"
-version = "1.0.6"
+version = "1.0.7"
 
 repositories {
 	google()
@@ -64,10 +64,9 @@ publishing {
 		val username = System.getenv("MAVEN_USERNAME")
 		val password = System.getenv("MAVEN_PASSWORD")
 
-		if (username == null || password == null) {
-			project.logger.lifecycle("Maven username/password missing, publishing to mavenLocal...")
+		if (username == null || password == null)
 			mavenLocal()
-		} else maven {
+		else maven {
 			credentials {
 				this.username = username
 				this.password = password
